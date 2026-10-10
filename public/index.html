@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#5b3026">
+  <meta name="description" content="Commandez des gaufres au chocolat avec Choco Campus et suivez votre fidélité.">
+  <title>Choco Campus — Commandes & Fidélité</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1>🧇 Choco Campus</h1>
+      <p>Des gaufres au chocolat, simplement et avec le sourire.</p>
+      <nav aria-label="Navigation principale">
+        <button class="tab active" id="studentTab" type="button">🎓 Espace étudiant</button>
+        <button class="tab" id="adminTab" type="button">🔐 Espace admin</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="notice" id="setupNotice">
+      <strong>Information :</strong> le vendeur doit configurer son numéro WhatsApp dans l’espace admin avant la première commande.
+    </div>
+    <div id="globalMessage" class="message hidden" role="status" aria-live="polite"></div>
+
+    <section id="studentView">
+      <div class="panel">
+        <h2>🍫 Menu</h2>
+        <div class="products">
+          <article class="product">
+            <div class="emoji" aria-hidden="true">🧇</div>
+            <h3>Gaufre Choco</h3>
+            <p class="muted">Gaufre avec chocolat à l’intérieur</p>
+            <div class="price">200 FCFA</div>
+            <button type="button" class="full" data-add="1">Ajouter</button>
+          </article>
+          <article class="product">
+            <div class="emoji" aria-hidden="true">🧇🍫</div>
+            <h3>Pack de 4</h3>
+            <p class="muted">4 gaufres au chocolat</p>
+            <div class="price">800 FCFA</div>
+            <button type="button" class="full" data-add="4">Ajouter le pack</button>
+          </article>
+        </div>
+        <p class="note">Prix fixe : 200 FCFA par gaufre. La disponibilité et l’heure de retrait sont à confirmer par WhatsApp.</p>
+      </div>
+
+      <div class="panel">
+        <h2>🛒 Ma commande</h2>
+        <div id="cartLines"><div class="empty">Ton panier est vide.</div></div>
+        <div class="total" id="cartTotal">Total : 0 FCFA</div>
+        <form id="studentOrderForm">
+          <label for="studentName">Ton nom ou surnom</label>
+          <input id="studentName" name="name" maxlength="100" autocomplete="name" placeholder="Ex. : Nadia" required>
+          <div class="row">
+            <div>
+              <label for="studentPhone">Ton numéro (facultatif)</label>
+              <input id="studentPhone" name="phone" maxlength="40" autocomplete="tel" placeholder="Pour te joindre si besoin">
+            </div>
+            <div>
+              <label for="pickup">Heure souhaitée de retrait</label>
+              <select id="pickup" name="pickup">
+                <option value="À confirmer">À confirmer avec le vendeur</option>
+                <option>Pause de 10 h</option>
+                <option>Pause de 12 h</option>
+                <option>Après les cours</option>
+              </select>
+            </div>
+          </div>
+          <label for="details">Précision (facultatif)</label>
+          <textarea id="details" name="notes" maxlength="500" placeholder="Bâtiment, point de rencontre, autre précision…"></textarea>
+          <button class="full green" id="whatsappOrder" type="submit">Commander par WhatsApp</button>
+        </form>
+        <p class="note">La commande est d’abord enregistrée dans la base de données. WhatsApp s’ouvre ensuite avec le récapitulatif : appuie sur « Envoyer » pour le transmettre au vendeur.</p>
+        <div id="orderFeedback" aria-live="polite"></div>
+      </div>
+
+      <div class="panel">
+        <h2>⭐ Fidélité</h2>
+        <p>Le vendeur enregistre les achats livrés dans l’espace admin. Selon les règles choisies par le vendeur, les achats éligibles font progresser le compteur et peuvent donner droit à une gaufre offerte.</p>
+        <p class="note">Les points de fidélité sont conservés dans la base de données du site, et non uniquement dans le navigateur du client.</p>
+      </div>
+    </section>
+
+    <section id="adminView" class="hidden">
+      <div id="adminAuthPanel" class="panel">
+        <h2>🔐 Accès administrateur</h2>
+        <p class="muted">Connecte-toi pour gérer les commandes, les paramètres et la fidélité des clients.</p>
+        <div id="authFormHost"></div>
+      </div>
+
+      <div id="adminDashboard" class="hidden">
+        <div class="panel dashboard-heading">
+          <div>
+            <h2>⚙️ Tableau de bord admin</h2>
+            <p class="muted">Les données sont enregistrées sur le serveur dans une base SQLite.</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" id="refreshAdmin" type="button">Actualiser</button>
+            <button class="secondary" id="exportData" type="button">Exporter les données</button>
+            <button class="red" id="logoutBtn" type="button">Déconnexion</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>📲 Configuration et fidélité</h2>
+          <form id="settingsForm">
+            <label for="sellerWhatsapp">Numéro WhatsApp du vendeur</label>
+            <input id="sellerWhatsapp" name="whatsapp" inputmode="numeric" maxlength="20" placeholder="Ex. : 2376XXXXXXXX, sans + ni espaces" required>
+            <div class="row">
+              <div>
+                <label for="minPurchase">Achat minimum comptabilisé</label>
+                <select id="minPurchase" name="minPurchase">
+                  <option value="1">1 gaufre ou plus</option>
+                  <option value="2">2 gaufres ou plus</option>
+                  <option value="3">3 gaufres ou plus</option>
+                  <option value="4">4 gaufres ou plus</option>
+                  <option value="5">5 gaufres ou plus</option>
+                  <option value="6">6 gaufres ou plus</option>
+                </select>
+              </div>
+              <div>
+                <label for="threshold">Seuil pour 1 gaufre offerte</label>
+                <select id="threshold" name="threshold">
+                  <option value="5">5 gaufres achetées</option>
+                  <option value="8">8 gaufres achetées</option>
+                  <option value="10" selected>10 gaufres achetées</option>
+                  <option value="12">12 gaufres achetées</option>
+                  <option value="15">15 gaufres achetées</option>
+                  <option value="20">20 gaufres achetées</option>
+                </select>
+              </div>
+            </div>
+            <button class="full" type="submit">Enregistrer les paramètres</button>
+            <p class="note">Une commande ne compte pour la fidélité qu’après avoir été marquée « Livrée ». Les commandes sous le minimum configuré ne font pas avancer le compteur. Les récompenses offertes ne sont pas des achats.</p>
+            <div id="settingsFeedback" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><span>Commandes enregistrées</span><strong id="statOrders">0</strong></div>
+          <div class="stat"><span>En attente</span><strong id="statPending">0</strong></div>
+          <div class="stat"><span>Clients fidélité</span><strong id="statCustomers">0</strong></div>
+        </div>
+
+        <div class="panel">
+          <h2>📥 Enregistrer une commande reçue</h2>
+          <p class="note">Utilise ce formulaire si un client commande directement par message ou en personne.</p>
+          <form id="manualOrderForm">
+            <div class="row">
+              <div><label for="manualName">Nom du client</label><input id="manualName" maxlength="100" required placeholder="Nom ou surnom"></div>
+              <div><label for="manualPhone">Téléphone / identifiant</label><input id="manualPhone" maxlength="40" placeholder="Facultatif"></div>
+            </div>
+            <div class="row">
+              <div><label for="manualQty">Nombre de gaufres</label><input id="manualQty" type="number" min="1" max="100" value="4" required></div>
+              <div><label for="manualPickup">Retrait</label><select id="manualPickup"><option>À confirmer</option><option>Pause de 10 h</option><option>Pause de 12 h</option><option>Après les cours</option></select></div>
+            </div>
+            <label for="manualNotes">Notes</label><input id="manualNotes" maxlength="500" placeholder="Point de rencontre, précisions…">
+            <button class="full" type="submit">Enregistrer la commande</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>📋 Commandes</h2>
+          <label for="orderSearch">Rechercher une commande</label>
+          <input id="orderSearch" placeholder="Nom, téléphone ou statut…">
+          <div id="ordersList"></div>
+        </div>
+
+        <div class="panel">
+          <h2>🎟️ Fidélité des clients</h2>
+          <label for="customerSearch">Rechercher un client</label>
+          <input id="customerSearch" placeholder="Nom ou téléphone…">
+          <div id="customersList"></div>
+        </div>
+      </div>
+    </section>
+    <footer class="footer">Choco Campus · Gaufres au chocolat à 200 FCFA</footer>
+  </main>
+</body>
+</html>
