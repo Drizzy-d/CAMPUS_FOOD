@@ -1,4 +1,4 @@
- <!doctype html>
+<!doctype html>
 <html lang="fr">
 
 <head>
@@ -512,20 +512,17 @@
                 };
                 await saveOrderAPI(newOrder);
 
-                const message = `🍫 CHOCO CAMPUS — NOUVELLE COMMANDE\n` +
+                const message = `🍫 CHOCO CAMPUS\n` +
                     `━━━━━━━━━━━━━━━━━━\n` +
-                    `🧾 Référence commande : ${orderRef}\n` +
-                    `👤 CLIENT\n` +
-                    `Nom : ${name}\n` +
+                    `Nom : ${name}👤\n` +
                     `Référence client : ${customerRef}\n` +
                     `Téléphone : ${phone || 'Non renseigné'}\n\n` +
-                    `🛒 DÉTAILS DE LA COMMANDE\n${summary}\n\n` +
+                    `DÉTAILS DE LA COMMANDE\n${summary}\n\n` +
                     `💰 TOTAL À PAYER : ${totalPrice.toLocaleString('fr-FR')} FCFA\n` +
-                    `📍 Retrait souhaité : ${pickup || 'À confirmer'}\n` +
-                    `📝 Point de rencontre / précisions : ${details || 'Aucune précision'}\n` +
+                    `📍 Heure souhaité : ${pickup || 'À confirmer'}\n` +
+                    `📝 Lieu de rencontre : ${details || 'Aucune précision'}\n` +
                     `━━━━━━━━━━━━━━━━━━\n` +
-                    `Merci d'avoir choisi Choco Campus ! 🧇🍫\n` +
-                    `Merci de confirmer la disponibilité et l'heure de retrait.`;
+                    `Merci d'avoir choisi Choco Campus ! 🧇🍫\n`;
 
                 const url = `https://wa.me/${wa}?text=${encodeURIComponent(message)}`;
                 $('orderFeedback').innerHTML = '<div class="success">Commande enregistrée ! WhatsApp va s’ouvrir avec le récapitulatif personnalisé. Appuie sur <strong>Envoyer</strong> pour transmettre la commande au vendeur.</div>';
